@@ -6,7 +6,7 @@ do{
 var gameOptions = {
   width: 1000,
   height: 500,
-  numEnemies: 1,
+  numEnemies: 25,
   speed: 1
 };
 
@@ -28,15 +28,15 @@ var Player = function(x, y, color){
   this.increaseScore();
 };
 
-Player.prototype.movePosition = function(dx, dy){
-  this.x += dx;
-  this.y += dy;
-  setPosition(this.x, this.y);
-};
+// Player.prototype.movePosition = function(dx, dy){
+//   this.x += dx;
+//   this.y += dy;
+//   setPosition(this.x, this.y);
+// };
 
-Player.prototype.setPosition = function(x, y){
-  this.$node.css({top: y, left: x});
-};
+// Player.prototype.setPosition = function(x, y){
+//   this.$node.css({top: y, left: x});
+// };
 
 Player.prototype.increaseScore = function(){
   this.score++;
@@ -55,19 +55,27 @@ for(var i = 0; i < playerNum; i++){
 //     .enter()
 //     .append('circle');
 
-var playerCircle = gameboard.selectAll()
+var playerCircles = gameboard.selectAll()
   .data(players)
   .enter()
   .append('circle')
-  .attr({'cx': function(d){return d.x;}, 'cy': function(d){return d.y;}, 'r': function(d){return d.r;}})
+  .attr({'cx': function(d){return d.x;}, 'cy': function(d){return d.y;}, 'r': 10})
   .style('fill', function(d){return d.color;});
 
-var playerAttribute = playerCircle
-  .attr("cx", function(d){return d.x;})
-  .attr("cy", function(d){return d.y;})
-  .attr("r", 10)
-  .attr("class", "player")
-  .style("fill", function(d){return d.color;});
+var drag = d3.behavior.drag().on('drag',function() {
+  d3.select(this).attr({
+    'cx': d3.event.x,
+    'cy': d3.event.y
+  });
+});
+
+playerCircles.call(drag);
+/*d3.selectAll('circle').on('.drag',function() {
+  playerCircles.attr({
+    'cx': d3.event.x,
+    'cy': d3.event.y
+  })
+});*/
 
 var scoreBoards = d3.selectAll('.scoreboard')
   .data(players);
@@ -94,15 +102,15 @@ var enemyGenerator = function() {
     enemies.push(enemy);
   }
   return enemies;
-}
+};
 
 var randomX = function() {
   return Math.random() * gameOptions.width;
-}
+};
 
 var randomY = function() {
   return Math.random() * gameOptions.height;
-}
+};
 
 var enemies = enemyGenerator();
 var enemySquares = gameboard.selectAll('rect')
