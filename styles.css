@@ -6,13 +6,11 @@ Feel free to use it if you like. */
   border: 10px solid black;
  }
 
- .player {
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
-  background-color: red;
-  position: absolute;
- }
+.scoreboard {
+  display: inline-block;
+  border: 5px solid black;
+  width: 245px;
+}
 
  .red {
   background-color: red;

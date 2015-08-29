@@ -1,4 +1,7 @@
 // start slingin' some d3 here.
+do{
+  var playerNum = +prompt("How many players do you want to play with? (1-4)");
+} while (playerNum % 1 !== 0 || playerNum < 1 || playerNum > 4);
 
 var gameOptions = {
   width: 1000,
@@ -15,11 +18,14 @@ var gameboard = d3.select('.container').append('svg').attr('width', gameOptions.
 // play with body styles and background.
 
 // creating a player class
-var Player = function(){
+var Player = function(x, y, color){
   // this.$node = $("<img src='http://icons.iconarchive.com/icons/icons-land/metro-raster-sport/96/Soccer-Ball-icon.png' style= width:" + gameOptions.width + "px;height:" + gameOptions.height + "px>");
-  this.x = gameOptions.width/2;
-  this.y = gameOptions.height/2;
-  this.color = "red";
+  this.x = x;
+  this.y = y;
+  this.color = color;
+  this.score = 0;
+  this.highScore = 0;
+  this.increaseScore();
 };
 
 Player.prototype.movePosition = function(dx, dy){
@@ -32,7 +38,15 @@ Player.prototype.setPosition = function(x, y){
   this.$node.css({top: y, left: x});
 };
 
-var player = new Player();
+Player.prototype.increaseScore = function(){
+  this.score++;
+  setTimeout(this.increaseScore.bind(this), 1000);
+};
+var colors = ['red', 'blue', 'yellow', 'green'];
+var players = [];
+for(var i = 0; i < playerNum; i++){
+  players[i] = new Player(((i + 1) * gameOptions.width)/(playerNum + 1), gameOptions.height/2, colors[i]);
+}
 // d3.select('body').data([null, null, player]).enter().append('img').attr('xlink:href', 'asteroid.png');
 // d3.select('svg').append('div').classed('player red', true);
 
@@ -41,8 +55,12 @@ var player = new Player();
 //     .enter()
 //     .append('circle');
 
-var playerCircle = gameboard.append('circle');
-playerCircle.data([player]);
+var playerCircle = gameboard.selectAll()
+  .data(players)
+  .enter()
+  .append('circle')
+  .attr({'cx': function(d){return d.x;}, 'cy': function(d){return d.y;}, 'r': function(d){return d.r;}})
+  .style('fill', function(d){return d.color;});
 
 var playerAttribute = playerCircle
   .attr("cx", function(d){return d.x;})
@@ -50,6 +68,20 @@ var playerAttribute = playerCircle
   .attr("r", 10)
   .attr("class", "player")
   .style("fill", function(d){return d.color;});
+
+var scoreBoards = d3.selectAll('.scoreboard')
+  .data(players);
+
+scoreBoards.exit().remove();
+scoreBoards.style('background-color', function(d){return d.color;});
+
+var updateScore = function(){
+  scoreBoards.select('.current').select('span')
+    .text(function(d){return d.score;});
+  setTimeout(updateScore, 1000);
+};
+updateScore();
+
 // using a createEnemies function to create however many enemies we want.
   // create data for the new Player and the enemies
 
