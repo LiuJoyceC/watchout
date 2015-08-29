@@ -7,19 +7,13 @@ var gameOptions = {
   width: 1000,
   height: 500,
   numEnemies: 25,
-  speed: 500
+  speed: 1000
 };
 
-// Set a container in html file to append the svg in
-// var gameboard = d3.select('body').append('div').classed('gameboard', true);
-  // set svg and append it to container
 var gameboard = d3.select('.container').append('svg').attr('width', gameOptions.width)
   .attr('height', gameOptions.height).classed('gameboard',true);
-// play with body styles and background.
 
-// creating a player class
 var Player = function(x, y, color){
-  // this.$node = $("<img src='http://icons.iconarchive.com/icons/icons-land/metro-raster-sport/96/Soccer-Ball-icon.png' style= width:" + gameOptions.width + "px;height:" + gameOptions.height + "px>");
   this.x = x;
   this.y = y;
   this.color = color;
@@ -27,16 +21,6 @@ var Player = function(x, y, color){
   this.highScore = 0;
   this.increaseScore();
 };
-
-// Player.prototype.movePosition = function(dx, dy){
-//   this.x += dx;
-//   this.y += dy;
-//   setPosition(this.x, this.y);
-// };
-
-// Player.prototype.setPosition = function(x, y){
-//   this.$node.css({top: y, left: x});
-// };
 
 Player.prototype.increaseScore = function(){
   this.score++;
@@ -48,13 +32,6 @@ var players = [];
 for(var i = 0; i < playerNum; i++){
   players[i] = new Player(((i + 1) * gameOptions.width)/(playerNum + 1), gameOptions.height/2, colors[i]);
 }
-// d3.select('body').data([null, null, player]).enter().append('img').attr('xlink:href', 'asteroid.png');
-// d3.select('svg').append('div').classed('player red', true);
-
-// var playerCircle = gameboard.select('circle')
-//     .data([player])
-//     .enter()
-//     .append('circle');
 
 var playerCircles = gameboard.selectAll()
   .data(players)
@@ -70,18 +47,12 @@ var playerCircles = gameboard.selectAll()
 
 var drag = d3.behavior.drag().on('drag',function() {
   d3.select(this).attr({
-    'cx': d3.event.x,
-    'cy': d3.event.y
+    'cx': Math.min(Math.max(d3.event.x, 10), gameOptions.width - 10),
+    'cy': Math.min(Math.max(10, d3.event.y), gameOptions.height - 10)
   });
 });
 
 playerCircles.call(drag);
-/*d3.selectAll('circle').on('.drag',function() {
-  playerCircles.attr({
-    'cx': d3.event.x,
-    'cy': d3.event.y
-  })
-});*/
 
 var scoreBoards = d3.selectAll('.scoreboard')
   .data(players);
@@ -147,9 +118,9 @@ var checkCollision = function() {
       if (Math.sqrt(dx * dx + dy * dy)  < totalRadius) {
         d.score = 0;
       }
-    })
+    });
 
-  })
+  });
   setTimeout(checkCollision, 200);
 };
 
@@ -168,11 +139,3 @@ setInterval(function() {
 }, gameOptions.speed);
 
 
-// using a createEnemies function to create however many enemies we want.
-  // create data for the new Player and the enemies
-
-// Helper functions?
-  // 2 separate functions to set a random X and Y coordinate within the bounds
-    //of the svg container
-
-// render the gameboard SVG using the data from the Player class and the createEnemies function
