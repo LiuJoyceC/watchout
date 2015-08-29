@@ -2,13 +2,21 @@
 
 /* Note: an asteroid image is included in this repo.
 Feel free to use it if you like. */
+
+ body {
+  background-image: url('mario-ticket.jpg');
+  background-size: 100%;
+ }
+
  .gameboard {
   border: 10px solid black;
+  background-image: url('gameboard.png');
+  background-size: 100%;
  }
 
 .scoreboard {
   display: inline-block;
   border: 5px solid black;
   width: 245px;
-  color: white;
+  color: black;
 }
