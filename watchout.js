@@ -7,7 +7,7 @@ var gameOptions = {
   width: 1000,
   height: 500,
   numEnemies: 25,
-  speed: 1
+  speed: 500
 };
 
 // Set a container in html file to append the svg in
@@ -40,9 +40,10 @@ var Player = function(x, y, color){
 
 Player.prototype.increaseScore = function(){
   this.score++;
+  this.highScore = Math.max(this.score, this.highScore);
   setTimeout(this.increaseScore.bind(this), 1000);
 };
-var colors = ['red', 'blue', 'yellow', 'green'];
+var colors = ['red', 'blue', 'orange', 'green'];
 var players = [];
 for(var i = 0; i < playerNum; i++){
   players[i] = new Player(((i + 1) * gameOptions.width)/(playerNum + 1), gameOptions.height/2, colors[i]);
@@ -59,7 +60,12 @@ var playerCircles = gameboard.selectAll()
   .data(players)
   .enter()
   .append('circle')
-  .attr({'cx': function(d){return d.x;}, 'cy': function(d){return d.y;}, 'r': 10})
+  .attr({
+    'cx': function(d){return d.x;},
+    'cy': function(d){return d.y;},
+    'r': 10,
+    'id': function(d){return d.color;}
+  })
   .style('fill', function(d){return d.color;});
 
 var drag = d3.behavior.drag().on('drag',function() {
@@ -86,7 +92,10 @@ scoreBoards.style('background-color', function(d){return d.color;});
 var updateScore = function(){
   scoreBoards.select('.current').select('span')
     .text(function(d){return d.score;});
+  scoreBoards.select('.high').select('span')
+    .text(function(d){return d.highScore;});
   setTimeout(updateScore, 1000);
+
 };
 updateScore();
 
@@ -97,7 +106,8 @@ var enemyGenerator = function() {
     var enemy = {
       r:10,
       x: randomX(),
-      y: randomY()
+      y: randomY(),
+      index: 'ind' + i
     };
     enemies.push(enemy);
   }
@@ -121,9 +131,42 @@ var enemySquares = gameboard.selectAll('rect')
     'x': function(d) {return d.x;},
     'y': function(d) {return d.y;},
     'width': function(d) {return 2*d.r;},
-    'height': function(d) {return 2*d.r;}
+    'height': function(d) {return 2*d.r;},
+    'id': function(d) {return d.index;}
   })
   .style('fill', 'purple');
+
+var checkCollision = function() {
+  d3.selectAll('circle').each(function(d) {
+    var totalRadius = 20;
+    var playerX = d3.select('#' + d.color).attr('cx');
+    var playerY = d3.select('#' + d.color).attr('cy');
+    d3.selectAll('rect').each(function(enemy) {
+      var dx = d3.select('#' + enemy.index).attr('x') - playerX;
+      var dy = d3.select('#' + enemy.index).attr('y') - playerY;
+      if (Math.sqrt(dx * dx + dy * dy)  < totalRadius) {
+        d.score = 0;
+      }
+    })
+
+  })
+  setTimeout(checkCollision, 200);
+};
+
+checkCollision();
+
+setInterval(function() {
+  enemies.forEach(function(enemy) {
+  d3.select('#' + enemy.index)
+    .transition()
+    .duration(gameOptions.speed)
+    .attr({
+      'x': randomX(),
+      'y': randomY()
+    });
+  });
+}, gameOptions.speed);
+
 
 // using a createEnemies function to create however many enemies we want.
   // create data for the new Player and the enemies
