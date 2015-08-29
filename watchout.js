@@ -82,6 +82,41 @@ var updateScore = function(){
 };
 updateScore();
 
+
+var enemyGenerator = function() {
+  var enemies = [];
+  for (var i = 0; i < gameOptions.numEnemies; i++) {
+    var enemy = {
+      r:10,
+      x: randomX(),
+      y: randomY()
+    };
+    enemies.push(enemy);
+  }
+  return enemies;
+}
+
+var randomX = function() {
+  return Math.random() * gameOptions.width;
+}
+
+var randomY = function() {
+  return Math.random() * gameOptions.height;
+}
+
+var enemies = enemyGenerator();
+var enemySquares = gameboard.selectAll('rect')
+  .data(enemies)
+  .enter()
+  .append('rect')
+  .attr({
+    'x': function(d) {return d.x;},
+    'y': function(d) {return d.y;},
+    'width': function(d) {return 2*d.r;},
+    'height': function(d) {return 2*d.r;}
+  })
+  .style('fill', 'purple');
+
 // using a createEnemies function to create however many enemies we want.
   // create data for the new Player and the enemies
 
